@@ -2,14 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Activity, Menu, X, ScanLine, LayoutDashboard, ShieldAlert } from 'lucide-react';
+import { Activity, Menu, X, ScanLine, LayoutDashboard, ShieldAlert, LogOut } from 'lucide-react';
 import SugarMeter from './ui/SugarMeter';
+import useAuthStore from '../store/authStore';
 
-export default function Navbar() {
+interface NavbarProps {
+  onScanClick?: () => void;
+  onAuthClick?: () => void;
+}
+
+export default function Navbar({ onScanClick, onAuthClick }: NavbarProps) {
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [showSugarProgress] = useState(false); // Set to true when user is logged in
+  const { user, logout, isAuthenticated } = useAuthStore();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -22,11 +28,16 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLogout = async () => {
+    await logout();
+    setIsMobileOpen(false);
+  };
+
   const navLinks = [
     { path: '/', label: 'Home', icon: null },
     { path: '/scan', label: 'Scan Food', icon: <ScanLine className="h-4 w-4" /> },
-    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
-    { path: '/admin', label: 'Admin', icon: <ShieldAlert className="h-4 w-4" /> },
+    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" />, requireAuth: true },
+    { path: '/admin', label: 'Admin', icon: <ShieldAlert className="h-4 w-4" />, requireAuth: true },
   ];
 
   return (
@@ -98,7 +109,7 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {navLinks.map((link: any) => (
             <Link
               key={link.path}
               to={link.path}
@@ -115,11 +126,42 @@ export default function Navbar() {
         </div>
 
         {/* Sugar Progress (when logged in) */}
-        {showSugarProgress && (
+        {isAuthenticated && (
           <div className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg border border-glass-border-teal bg-bg-secondary/20">
             <SugarMeter valueTsp={3.5} maxTsp={6} size="sm" />
           </div>
         )}
+
+        {/* Auth Buttons */}
+        <div className="hidden md:flex items-center gap-3">
+          {isAuthenticated ? (
+            <>
+              <span className="text-sm text-gray-300">{user?.name}</span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-danger/20 text-danger hover:bg-danger/30 transition-colors duration-200 text-sm font-medium"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={onScanClick}
+                className="px-4 py-2 rounded-lg bg-tealAccent text-midnight hover:bg-teal-400 transition-colors duration-200 text-sm font-semibold"
+              >
+                Scan Free
+              </button>
+              <button
+                onClick={onAuthClick}
+                className="px-4 py-2 rounded-lg border border-glass-border-teal text-tealAccent hover:bg-tealAccent/10 transition-colors duration-200 text-sm font-medium"
+              >
+                Sign In
+              </button>
+            </>
+          )}
+        </div>
 
         {/* Mobile Menu Button */}
         <button
@@ -146,7 +188,7 @@ export default function Navbar() {
         className="fixed top-16 left-0 right-0 z-40 md:hidden bg-midnight/95 backdrop-blur-glass border-b border-glass-border-teal/40"
       >
         <div className="px-6 py-4 space-y-2 max-h-96 overflow-y-auto">
-          {navLinks.map((link) => (
+          {navLinks.map((link: any) => (
             <Link
               key={link.path}
               to={link.path}
@@ -161,6 +203,45 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          {/* Mobile Auth Buttons */}
+          <div className="pt-4 border-t border-glass-border-teal/40 space-y-2 mt-4">
+            {isAuthenticated ? (
+              <>
+                <div className="px-4 py-2 text-sm text-gray-400">
+                  Logged in as <span className="text-white font-medium">{user?.name}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-danger/20 text-danger hover:bg-danger/30 transition-colors duration-200 text-sm font-medium"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    onScanClick?.();
+                    setIsMobileOpen(false);
+                  }}
+                  className="w-full px-4 py-3 rounded-lg bg-tealAccent text-midnight hover:bg-teal-400 transition-colors duration-200 text-sm font-semibold"
+                >
+                  Scan Free
+                </button>
+                <button
+                  onClick={() => {
+                    onAuthClick?.();
+                    setIsMobileOpen(false);
+                  }}
+                  className="w-full px-4 py-3 rounded-lg border border-glass-border-teal text-tealAccent hover:bg-tealAccent/10 transition-colors duration-200 text-sm font-medium"
+                >
+                  Sign In
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </motion.div>
 

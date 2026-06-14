@@ -65,7 +65,7 @@ const steps = [
   },
 ];
 
-export default function Home() {
+export default function Home({ onScanClick }: { onScanClick?: () => void }) {
   const containerVariant = useMemo(() => containerVariants, []);
   const itemVariant = useMemo(() => fadeUpVariants, []);
 
@@ -119,13 +119,13 @@ export default function Home() {
                   variants={fadeUpVariants}
                   className="flex flex-col sm:flex-row gap-4 pt-4"
                 >
-                  <Link
-                    to="/scan"
+                  <button
+                    onClick={onScanClick}
                     className="btn-primary group flex items-center justify-center"
                   >
                     <Zap className="w-5 h-5 group-hover:animate-pulse" />
                     Scan Now
-                  </Link>
+                  </button>
 
                   <button className="btn-secondary">Learn More</button>
                 </motion.div>
