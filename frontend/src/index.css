@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0A0F1E;        /* deep midnight */
+  --bg-secondary: #0E1628;      /* card background */
+  --bg-glass: rgba(14, 22, 40, 0.7);
+  --accent-teal: #00D4B4;       /* primary CTA, success states */
+  --accent-amber: #FFB347;      /* warnings, sugar meter high */
+  --accent-danger: #FF4757;     /* danger, very high sugar */
+  --text-primary: #F0F4FF;
+  --text-secondary: #8892A4;
+  --glass-border: rgba(0, 212, 180, 0.15);
+  --blur: blur(20px);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-midnight text-neutral-200 font-sans antialiased overflow-x-hidden;
+    background-color: var(--bg-primary);
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(0, 212, 180, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(255, 179, 71, 0.05) 0%, transparent 40%);
+    min-height: 100vh;
+  }
+
+  /* Custom scrollbar styling for modern dark UI */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0A0F1E;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1E293B;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00D4B4;
+  }
+}
+
+@layer components {
+  /* Glassmorphism card style */
+  .glass-card {
+    @apply bg-glassBg backdrop-blur-glass border border-glassBorder rounded-2xl;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  /* Interactive neon transitions */
+  .btn-primary {
+    @apply px-6 py-3 bg-tealAccent hover:bg-opacity-90 text-midnight font-bold rounded-xl transition-all duration-300 shadow-glow-teal hover:shadow-glow-teal hover:scale-105 active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-transparent hover:bg-glassBorder text-tealAccent hover:text-white border border-tealAccent/40 hover:border-tealAccent rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  .glass-input {
+    @apply px-4 py-3 bg-midnight/60 border border-glassBorder focus:border-tealAccent/60 text-white rounded-xl outline-none transition-all duration-300 w-full focus:shadow-glow-teal;
+  }
+}
+
+/* Neon Scanline Animation Keyframes */
+@keyframes scan {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 212, 180, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(0, 212, 180, 0.6);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+
+@keyframes particle-float {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) translateX(var(--tx, 0));
+  }
+}
+
+.scan-line {
+  position: absolute;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(to right, transparent, #22c55e, transparent);
+  animation: scan 3s linear infinite;
+  box-shadow: 0 0 10px #22c55e, 0 0 20px #22c55e;
+}
